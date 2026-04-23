@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1A3A5C">
+<title>FMC650 — אשף התקנה</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;padding:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,Helvetica,sans-serif;
+    background:#f0f2f5;direction:rtl;font-size:15px;color:#222;}
+
+  /* ─── Layout ─── */
+  #app{max-width:600px;margin:0 auto;padding:12px;}
+  .card{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;
+    -webkit-box-shadow:0 2px 12px rgba(0,0,0,.07);box-shadow:0 2px 12px rgba(0,0,0,.07);}
+
+  /* ─── Header ─── */
+  .hdr{background:#1A3A5C;background:-webkit-linear-gradient(315deg,#1A3A5C,#0D7377);
+    background:linear-gradient(135deg,#1A3A5C,#0D7377);
+    border-radius:14px;padding:16px 18px;margin-bottom:14px;color:#fff;
+    display:-webkit-flex;display:flex;
+    -webkit-justify-content:space-between;justify-content:space-between;
+    -webkit-align-items:center;align-items:center;}
+  .hdr-title{font-size:19px;font-weight:900;margin:0;}
+  .hdr-sub{font-size:12px;opacity:.8;margin:2px 0 0;}
+  .hdr-icon{font-size:38px;text-align:center;margin-right:12px;}
+  .hdr-overall{margin-top:8px;background:rgba(255,255,255,.2);border-radius:8px;
+    height:6px;overflow:hidden;}
+  .hdr-overall-fill{height:100%;background:#fff;border-radius:8px;
+    -webkit-transition:width .4s;transition:width .4s;}
+  .hdr-overall-lbl{font-size:10px;opacity:.7;margin-top:3px;}
+
+  /* ─── Step nav ─── */
+  .step-nav{display:-webkit-flex;display:flex;overflow-x:auto;padding:10px 0 4px;
+    scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .step-nav::-webkit-scrollbar{display:none;}
+  .step-btn{-webkit-flex:0 0 auto;flex:0 0 auto;display:-webkit-flex;display:flex;
+    -webkit-flex-direction:column;flex-direction:column;
+    -webkit-align-items:center;align-items:center;
+    padding:8px 12px;border-radius:10px;border:2px solid #dee2e6;
+    background:#fff;cursor:pointer;min-width:65px;margin-left:6px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    -webkit-transition:all .2s;transition:all .2s;font-size:11px;font-weight:700;color:#777;}
+  .step-btn:first-child{margin-left:0;}
+  .step-btn.active{-webkit-transform:translateY(-2px);transform:translateY(-2px);}
+  .step-btn .s-icon{font-size:18px;margin-bottom:3px;}
+  .step-count{font-size:10px;font-weight:700;margin-top:1px;}
+  .swipe-hint{text-align:center;font-size:11px;color:#aaa;padding:2px 0 8px;}
+
+  /* ─── Progress ─── */
+  .prog-bar{height:8px;background:#dee2e6;border-radius:8px;overflow:hidden;margin:8px 0 16px;}
+  .prog-fill{height:100%;border-radius:8px;-webkit-transition:width .4s;transition:width .4s;}
+  .prog-label{display:-webkit-flex;display:flex;
+    -webkit-justify-content:space-between;justify-content:space-between;
+    font-size:12px;color:#888;margin-bottom:3px;}
+
+  /* ─── Inherited data banner ─── */
+  .inh-banner{border-radius:10px;padding:12px 14px;margin-bottom:14px;}
+  .inh-banner-title{font-weight:700;font-size:12px;margin-bottom:8px;}
+  .inh-rows{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;}
+  .inh-cell{margin-left:16px;margin-bottom:4px;font-size:13px;white-space:nowrap;}
+  .inh-val{font-family:"Courier New",Courier,monospace;font-weight:700;}
+
+  /* ─── Checklist ─── */
+  .chk-item{display:-webkit-flex;display:flex;
+    -webkit-align-items:flex-start;align-items:flex-start;
+    padding:12px 12px;border-radius:8px;cursor:pointer;margin-bottom:6px;
+    border:1.5px solid #dee2e6;background:#f4f6f8;
+    -webkit-transition:all .15s;transition:all .15s;
+    -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;min-height:48px;}
+  .chk-item.done{background:#D1F0E0;border-color:#198754;}
+  .chk-box{width:24px;height:24px;min-width:24px;border-radius:5px;
+    border:2px solid #adb5bd;background:#fff;display:-webkit-flex;display:flex;
+    -webkit-align-items:center;align-items:center;
+    -webkit-justify-content:center;justify-content:center;
+    margin-top:1px;margin-left:10px;font-size:14px;font-weight:900;
+    -webkit-transition:all .15s;transition:all .15s;}
+  .chk-item.done .chk-box{background:#198754;border-color:#198754;color:#fff;}
+  .chk-text{font-size:13.5px;line-height:1.5;color:#333;}
+  .chk-item.done .chk-text{color:#155724;text-decoration:line-through;}
+
+  /* ─── Info cards ─── */
+  .info-card{display:-webkit-flex;display:flex;
+    -webkit-align-items:flex-start;align-items:flex-start;
+    border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:8px;}
+
+  /* ─── Form ─── */
+  .form-group{margin-bottom:12px;}
+  .form-label{display:block;font-size:13px;font-weight:700;color:#1A3A5C;margin-bottom:4px;}
+  .form-input{width:100%;padding:10px 12px;border-radius:7px;
+    border:1.5px solid #dee2e6;font-size:14px;outline:none;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    background:#fff;-webkit-appearance:none;appearance:none;
+    -webkit-transition:border-color .15s;transition:border-color .15s;}
+  .form-input:focus{border-color:#0D6EFD;}
+  .form-input.invalid{border-color:#dc3545;background:#fff8f8;}
+  .form-input.valid{border-color:#198754;}
+  .mono{font-family:"Courier New",Courier,monospace;direction:ltr;text-align:left;letter-spacing:.5px;}
+  .form-hint{font-size:11px;color:#888;margin-top:3px;}
+  .form-err{font-size:11px;color:#dc3545;margin-top:3px;font-weight:600;}
+  .form-grid{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;margin:-5px;}
+  .form-grid>.form-group{-webkit-flex:1 1 calc(50% - 10px);flex:1 1 calc(50% - 10px);
+    min-width:140px;margin:5px;}
+
+  /* ─── Buttons ─── */
+  .btn{width:100%;padding:13px;border-radius:9px;border:none;
+    font-size:15px;font-weight:700;cursor:pointer;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    -webkit-transition:all .2s;transition:all .2s;margin-bottom:8px;
+    -webkit-tap-highlight-color:transparent;min-height:48px;}
+  .btn-primary{color:#fff;}
+  .btn-secondary{background:#fff;border:2px solid #dee2e6;color:#1A3A5C;}
+  .btn:disabled{background:#adb5bd!important;cursor:not-allowed;opacity:.7;}
+  .btn-row{display:-webkit-flex;display:flex;}
+  .btn-row .btn{margin-bottom:0;}
+  .btn-row .btn+.btn{margin-right:8px;}
+
+  /* ─── Warnings ─── */
+  .warn-box{background:#fff3cd;border:1.5px solid #ffc107;border-radius:8px;
+    padding:10px 14px;font-size:13px;color:#856404;display:-webkit-flex;display:flex;
+    -webkit-align-items:flex-start;align-items:flex-start;margin-bottom:14px;}
+  .warn-box>span:first-child{margin-left:8px;font-size:18px;}
+
+  /* ─── Code box ─── */
+  .code-box{background:#0A2744;border-radius:8px;padding:12px 14px;
+    font-family:"Courier New",Courier,monospace;font-size:13px;color:#00FF88;
+    direction:ltr;margin-bottom:14px;line-height:1.7;}
+  .code-comment{color:#aaa;}
+  .code-yellow{color:#FFD700;}
+
+  /* ─── Step header ─── */
+  .step-hdr{border-right:5px solid;padding-right:14px;margin-bottom:16px;}
+  .step-hdr h2{margin:0;font-size:20px;color:#1A3A5C;}
+  .step-hdr p{margin:4px 0 0;color:#666;font-size:13px;}
+
+  /* ─── Badge ─── */
+  .badge{border-radius:12px;padding:3px 12px;font-size:12px;font-weight:700;display:inline-block;}
+
+  /* ─── Done screen ─── */
+  .done-hdr{background:#1A3A5C;background:-webkit-linear-gradient(315deg,#1A3A5C,#198754);
+    background:linear-gradient(135deg,#1A3A5C,#198754);
+    border-radius:14px;padding:28px;text-align:center;color:#fff;margin-bottom:16px;}
+  .done-hdr .big-icon{font-size:56px;margin-bottom:10px;}
+  .done-hdr h2{margin:0;font-size:24px;}
+  .done-hdr p{margin:6px 0 0;opacity:.85;font-size:14px;}
+  .summary-row{display:-webkit-flex;display:flex;
+    -webkit-justify-content:space-between;justify-content:space-between;
+    padding:7px 0;border-bottom:1px solid #dee2e6;font-size:14px;}
+  .summary-row:last-child{border-bottom:none;}
+  .summary-key{font-weight:700;color:#1A3A5C;}
+  .summary-val{font-family:"Courier New",Courier,monospace;color:#333;font-size:13px;text-align:left;}
+
+  /* ─── Mini status ─── */
+  .mini-status{display:-webkit-flex;display:flex;
+    -webkit-justify-content:center;justify-content:center;
+    -webkit-flex-wrap:wrap;flex-wrap:wrap;margin-top:10px;}
+  .mini-chip{border-radius:8px;padding:4px 10px;font-size:11px;margin:3px;
+    border:1.5px solid #dee2e6;background:#fff;color:#888;}
+
+  /* ─── Auto-save badge ─── */
+  .save-badge{position:fixed;bottom:16px;left:16px;background:#198754;color:#fff;
+    border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;
+    opacity:0;-webkit-transition:opacity .4s;transition:opacity .4s;
+    pointer-events:none;z-index:999;
+    -webkit-box-shadow:0 2px 8px rgba(0,0,0,.2);box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .save-badge.show{opacity:1;}
+
+  /* ─── Print ─── */
+  @media print{
+    body{background:#fff;font-size:12px;}
+    .step-nav,.btn,.btn-row,.warn-box,.mini-status,.save-badge,
+    #btn-csv,#btn-restart,#btn-copy,#btn-print,#btn-clear-form,#btn-save-new,#btn-suggest-fotaweb,.btn-mini,.swipe-hint{display:none!important;}
+    .card{-webkit-box-shadow:none;box-shadow:none;border:1px solid #dee2e6;
+      page-break-inside:avoid;}
+    .done-hdr{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+
+  textarea{resize:vertical;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;direction:rtl;}
+
+  .wizard-toolbar{display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;
+    -webkit-justify-content:flex-end;justify-content:flex-end;gap:8px;margin:-4px 0 12px;}
+  .btn-mini{padding:7px 12px;border-radius:7px;font-size:12px;font-weight:700;min-height:auto;margin:0;
+    border:1.5px solid #dee2e6;background:#fff;color:#1A3A5C;cursor:pointer;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;}
+  .btn-mini:hover{background:#f4f6f8;}
+
+  .hdr-tech{font-size:11px;opacity:.88;margin-top:5px;line-height:1.4;word-break:break-word;}
+  details.excel-advanced{margin-top:12px;border:1.5px solid #dee2e6;border-radius:10px;
+    background:#fff;padding:4px 10px 10px;}
+  details.excel-advanced>summary{cursor:pointer;font-weight:700;font-size:13px;color:#1A3A5C;
+    padding:8px 4px;list-style-position:outside;}
+  details.excel-advanced[open]>summary{margin-bottom:6px;border-bottom:1px solid #eee;}
+  .req::after{content:" *";color:#dc3545;font-weight:900;}
+  .gate-hint{font-size:12px;color:#856404;line-height:1.5;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="save-badge" id="save-badge">💾 נשמר</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+//  DATA  —  Step order: Vehicle → FOTAWEB → Wiring → Navixe → Cloud
+// ════════════════════════════════════════════════════════════════════════════
+var STEPS_META = [
+  {id:1, label:"שיוך כלי",   icon:"🚛", col:"orange", bg:"#E06000"},
+  {id:2, label:"FOTAWEB",    icon:"🌐", col:"teal",   bg:"#0D7377"},
+  {id:3, label:"חיווט",      icon:"🔧", col:"blue",   bg:"#0D6EFD"},
+  {id:4, label:"אקטיבציה",   icon:"⚙️", col:"amber",  bg:"#B36B00"},
+  {id:5, label:"נביקסי",     icon:"🗺️",  col:"purple", bg:"#6F42C1"},
+  {id:6, label:"אימות ענן",  icon:"☁️",  col:"green",  bg:"#198754"},
+];
+
+var LT = {teal:"#E0F5F5",blue:"#D0E8FF",purple:"#EDE7F6",orange:"#FFF3CD",amber:"#FFE8CC",green:"#D1F0E0"};
+
+var STEP_TITLES = [
+  "",
+  "פרטי כלי + טבלת Upgrade",
+  "FOTAWEB — רישום מרחוק",
+  "וידוי חיווט פיזי",
+  "אקטיבציה — טלטוניקה",
+  "חיבור נביקסי",
+  "אימות נתונים בענן",
+];
+var STEP_SUBS = [
+  "",
+  "GSE (מזהה ELAL), Category ואנרגיה לפני FOTAWEB / נביקסי",
+  "ניהול מרחוק, שדרוג FW ו-SMS",
+  "בדיקת כל חיבורי החומרה",
+  "טעינת קובץ CFG נכון ואימות פרמטרים ב-CFG Viewer",
+  "Fleet Management ישראלי",
+  "ווידוי זרימת נתונים לשרת",
+];
+
+// Step 1 = Vehicle, Step 2 = FOTAWEB, Step 3 = Wiring,
+// Step 4 = Teltonika activation, Step 5 = Navixe, Step 6 = Cloud
+var CHECKLISTS = {
+  1:[
+    {id:"v1", t:"מזהה GSE: 4–5 ספרות (מספר רישיון ELAL) — מוצג כ-GSE ####"},
+    {id:"v2", t:"Category נבחר מתוך טבלת ELAL Upgrade"},
+    {id:"v3", t:"מזהה GSE תואם לרשומה בטבלה"},
+    {id:"v4", t:"כלי שויך לקבוצה הנכונה (ELAL_GSE / BUS / TRUCK)"},
+    {id:"v5", t:"אייקון מפה מוגדר לפי סוג הכלי"},
+    {id:"v6", t:"פורמט שם FOTAWEB נקבע: GSE-Category-#### (לדוגמה GSE-ACU-5032)"},
+    {id:"v7", t:"קובץ .cfg יישמר לפי המזהה: GSE_5032.cfg (לפי הספרות שהוזנו)"},
+  ],
+  2:[
+    {id:"f1", t:"כניסה ל-https://fota.teltonika.lt — פרטי גישה מ-2PLUS"},
+    {id:"f2", t:"לחיצה: + Add Device → בחירת דגם FMC650"},
+    {id:"f3", t:"הזנת IMEI (15 ספרות) מהמדבקה/Configurator"},
+    {id:"f4", t:"הגדרת Name לפי פורמט: GSE-Category-#### (לדוגמה GSE-ACU-5032)"},
+    {id:"f5", t:"שיוך SIM: הזנת MSISDN + ICCID + APN"},
+    {id:"f6", t:"שיוך לקבוצה: ELAL_GSE (Batch Upgrade עתידי)"},
+    {id:"f7", t:"ווידוי סטטוס Online (ירוק) בפורטל"},
+    {id:"f8", t:"שמירת סיסמת SMS ב-Device Notes של המכשיר"},
+  ],
+  3:[
+    {id:"i1", t:"מולטימטר: VCC פין 11 ↔ פין 1 = 22–26V DC"},
+    {id:"i2", t:"פיוז 15A תקין בקו VCC — לא יותר מ-30 ס\"מ ממקור"},
+    {id:"i3", t:"CAN H (פין 12, כחול) מחובר ל-CAN High הרכב"},
+    {id:"i4", t:"CAN L (פין 2, צהוב) מחובר ל-CAN Low הרכב"},
+    {id:"i5", t:"התנגדות CAN H↔L ≈ 60Ω (הצתה כבויה)"},
+    {id:"i6", t:"AIN1 (פין 17): קריאת ולטאז' דלק 0.5–4.5V"},
+    {id:"i7", t:"IGN/DIN1 (פין 15): מגיב להצתה"},
+    {id:"i8", t:"DIN2 (פין 5): מגיב למצב PTO/עבודה"},
+    {id:"i9", t:"GPS: HDOP < 1.5, לפחות 6 לוויינים"},
+    {id:"i10",t:"Configurator Live Data: CAN קורא RPM + מהירות + דלק%"},
+  ],
+  4:[
+    {id:"t1", t:"נבחר קובץ CFG נכון: J1730_GoldHoffer (רק גורר Goldhofer) / אחרת J1939_Motorized_Final"},
+    {id:"t2", t:"בוצעה טעינת CFG לטראקר בטלטוניקה"},
+    {id:"t3", t:"אומת ב-CFG Viewer: primary_server_domain / ip נכון"},
+    {id:"t4", t:"אומת ב-CFG Viewer: primary_server_port ו-protocol נכונים"},
+    {id:"t5", t:"אומת ב-CFG Viewer: APN ו-FOTA (domain/port/period/enabled) נטענו"},
+    {id:"t6", t:"אישור סופי: הפרמטרים נכונים ומעידים על שידור לנביקסי"},
+  ],
+  5:[
+    {id:"n1", t:"כניסה לפורטל נביקסי עם פרטי Admin"},
+    {id:"n2", t:"Devices → Add → הזנת IMEI + בחירת Protocol Teltonika"},
+    {id:"n3", t:"עדכון Server IP בטראקר ל-IP שרת נביקסי"},
+    {id:"n4", t:"Configurator → GPRS → שמירת IP + Port + APN"},
+    {id:"n5", t:"ווידוי: סטטוס Online בנביקסי (ירוק)"},
+    {id:"n6", t:"מיקום GPS מוצג על מפת נביקסי בזמן אמת"},
+    {id:"n7", t:"הפעל הצתה — ודא Event מגיע לנביקסי"},
+  ],
+  6:[
+    {id:"c1", t:"Live Map: כלי נע על המפה עם מסלול רציף"},
+    {id:"c2", t:"CAN בענן: RPM, מהירות, עומס מנוע — כולם בזמן אמת"},
+    {id:"c3", t:"Fuel Level %: מוצג ומשתנה בהתאם למיכל"},
+    {id:"c4", t:"IGN Event: רשומה נוצרת עם הצתה / כיבוי"},
+    {id:"c5", t:"PTO Event: רשומה נוצרת עם שינוי מצב עבודה"},
+    {id:"c6", t:"FOTAWEB: סטטוס Online ∧ גרסת Firmware נכונה"},
+    {id:"c7", t:"בדיקת נסיעה: 5 דקות — מסלול שמור בשרת"},
+    {id:"c8", t:"SMS getinfo: תשובה חוזרת תוך 30 שניות"},
+    {id:"c9", t:"אחראי הצי אישר קבלת גישה ובצע נסיעת בדיקה"},
+  ],
+};
+
+var INFOS = {
+  1:[
+    {i:"🚛", t:"GSE = מספר הרישיון ELAL (4–5 ספרות). במסך מוצג בפורמט GSE ####"},
+    {i:"📑", t:"שדות Category / GSE / Energy — מיושרים לקובץ ELAL Upgrade.xls"},
+    {i:"🏷️", t:"קבע שם FOTAWEB: GSE-Category-#### (למשל GSE-ACU-5033)"},
+    {i:"📁", t:"שמור .cfg בשם GSE_####.cfg לשימוש בשדרוגים עתידיים"},
+    {i:"👥", t:"שיוך לקבוצה = Batch Firmware Update בעתיד בלחיצה אחת"},
+  ],
+  2:[
+    {i:"🔑", t:"כתובת: https://fota.teltonika.lt — קבל פרטי גישה מ-2PLUS"},
+    {i:"📛", t:"פורמט שם חובה: GSE-ACU-5032 (GSE-Category-English-מספר)"},
+    {i:"📱", t:"SIM MSISDN = מספר ה-SIM בטראקר; Phone Number = עמודת האקסל (לא תמיד אותו מספר)"},
+    {i:"📡", t:"לאחר רישום — שדרוג Firmware ושליחת Config מרחוק ללא ביקור פיזי"},
+    {i:"💬", t:"שנה סיסמת SMS מ-1234 לסיסמה ייחודית ושמור ב-Device Notes"},
+  ],
+  3:[
+    {i:"⚡", t:"מדוד VCC בין פין 11 לפין 1 — חייב להיות 22–26V DC"},
+    {i:"🔵", t:"CAN: התנגדות 60Ω = שני נגדי סיום תקינים ברשת"},
+    {i:"⛽", t:"ריק ≈ 0.5V, מלא ≈ 4.5V — כייל לפי חיישן הספציפי"},
+    {i:"🛑", t:"אם חיבור נכשל — עצור ותקן לפני מעבר לשלב הבא"},
+  ],
+  4:[
+    {i:"📦", t:"כלל בחירת קובץ: גורר Goldhofer → J1730_GoldHoffer, כל השאר → J1939_Motorized_Final"},
+    {i:"🧪", t:"אימות פרמטרים דרך run_teltonika_cfg_viewer.bat אחרי טעינת הקונפיג"},
+    {i:"📡", t:"רק אחרי אימות פרמטרים נכונים ממשיכים לנביקסי"},
+  ],
+  5:[
+    {i:"🌐", t:"נביקסי = פלטפורמת Fleet Management ישראלית"},
+    {i:"🔌", t:"עדכן Server IP ב-Configurator → GPRS → Domain/IP"},
+    {i:"⚙️", t:"Protocol: Codec 8 Extended — תואם לנביקסי ול-Teltonika"},
+    {i:"✅", t:"ודא Online ומיקום GPS על מפת נביקסי לפני המשך"},
+  ],
+  6:[
+    {i:"🗺️", t:"Live Map: כלי חייב לנוע עם מסלול — לא רק נקודה"},
+    {i:"📊", t:"CAN Data: RPM, מהירות, עומס ודלק — כולם נדרשים"},
+    {i:"📱", t:"SMS: שלח 'MyPass getgps' — קבל קואורדינטות תוך 30 שניות"},
+    {i:"🎉", t:"לאחר אישור כל הסעיפים — ההתקנה מוכנה למסירה"},
+  ],
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+//  STATE + PERSISTENCE
+// ════════════════════════════════════════════════════════════════════════════
+var STORAGE_KEY = "fmc650_wizard_v4";
+
+// ערכי Site / Category מתוך ELAL Upgrade.xls (Sheet_1)
+var SITE_OPTIONS = ["TLV - Tel-aviv"];
+var DIVISION_OPTIONS = [
+  "גורר","מטען","סולם נוסעים מקורה","מזגן","במת הרמה","גנרטור"
+];
+var ENERGY_TYPE_OPTIONS = ["Diesel", "Electric", "Benzen"];
+
+var S = {
+  step:1, completed:[], checks:{1:{},2:{},3:{},4:{},5:{},6:{}}, done:false,
+  techName:"", techPhone:"",
+  // Step 1 — vehicle + שורת Excel
+  licensePlate:"", vehicleType:"GSE", vin:"",
+  site:"TLV - Tel-aviv", division:"", gse:"", energy:"",
+  tankBatterySpec:"", installationDate:"",
+  unit:"", // legacy: ממוזג ל-division בטעינה
+  // Step 2 — FOTAWEB
+  imei:"", deviceName:"", simNum:"", iccid:"", smsPass:"",
+  contactName:"", excelPhone:"",
+  // Step 4 — Teltonika activation
+  cfgLoadedFile:"", cfgVerified:"",
+  cfgFileName:"", cfgAutoStatus:"", cfgAutoReport:"",
+  cfgViewerPreview:"",
+  cfgNavixyDomain:"", cfgNavixyPort:"",
+  // Step 5 — Navixe
+  navixeIp:"", navixePort:"5027", navixeApproved:"",
+  notes:"",
+};
+
+function saveState(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(S));
+    var badge = document.getElementById("save-badge");
+    if(badge){
+      badge.className = "save-badge show";
+      clearTimeout(badge._t);
+      badge._t = setTimeout(function(){ badge.className = "save-badge"; }, 1800);
+    }
+  } catch(e){}
+}
+
+function loadState(){
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY)
+      || localStorage.getItem("fmc650_wizard_v3");
+    if(!raw) return;
+    var saved = JSON.parse(raw);
+    var keys = Object.keys(saved);
+    for(var i=0;i<keys.length;i++){
+      var k=keys[i];
+      if(k in S) S[k]=saved[k];
+    }
+    if(!S.division && S.unit) S.division = S.unit;
+    if(!S.site) S.site = "TLV - Tel-aviv";
+    if(S.division) S.unit = S.division;
+    if(saved.labels && !S.tankBatterySpec) S.tankBatterySpec = saved.labels;
+    for(var n=1;n<=6;n++){ if(!S.checks[n]) S.checks[n]={}; }
+    normalizeGseDigits();
+    if(gseFormatted()) S.licensePlate=gseFormatted();
+    syncDerivedNames();
+    if((!S.cfgNavixyDomain || !S.cfgNavixyPort) && S.cfgViewerPreview){
+      var fromSavedPreview=extractNavixyFromText(S.cfgViewerPreview);
+      applyNavixyFromCfg(fromSavedPreview.domain, fromSavedPreview.port);
+    }
+  } catch(e){}
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  VALIDATION
+// ════════════════════════════════════════════════════════════════════════════
+function luhn(num){
+  var s=String(num).replace(/\D/g,"");
+  if(s.length!==15) return false;
+  var sum=0, dbl=false;
+  for(var i=s.length-1;i>=0;i--){
+    var d=Number(s.charAt(i));
+    if(dbl){ d*=2; if(d>9) d-=9; }
+    sum+=d;
+    dbl=!dbl;
+  }
+  return sum%10===0;
+}
+
+var VALIDATORS = {
+  imei: function(v){
+    var n=String(v||"").replace(/\D/g,"");
+    if(!n) return "";
+    if(n.length!==15) return "IMEI חייב להיות בדיוק 15 ספרות";
+    if(!luhn(n)) return "IMEI לא עבר Luhn check — בדוק מחדש";
+    return "";
+  },
+  iccid: function(v){
+    var n=String(v||"").replace(/\D/g,"");
+    if(!n) return "";
+    if(!/^\d{18,20}$/.test(n)) return "ICCID חייב להיות 18–20 ספרות";
+    return "";
+  },
+  deviceName: function(v){
+    if(!v) return "";
+    if(!/^GSE-[A-Za-z]+-\d{4,5}$/.test(v)) return "פורמט: GSE-ACU-5032";
+    return "";
+  },
+  simNum: function(v){
+    if(!v) return "";
+    var n=String(v).trim();
+    if(!/^\+?\d{9,15}$/.test(n)) return "מספר טלפון חוקי: 9–15 ספרות (אפשר + בתחילה)";
+    return "";
+  },
+  vin: function(v){
+    if(!v) return "";
+    if(v.length!==17) return "VIN חייב להיות בדיוק 17 תווים ("+v.length+" כרגע)";
+    if(!/^[A-HJ-NPR-Z0-9]{17}$/i.test(v)) return "VIN מכיל תווים לא חוקיים (I,O,Q אסורים)";
+    return "";
+  },
+  navixePort: function(v){
+    if(!v) return "";
+    var p=parseInt(v,10);
+    if(isNaN(p)||p<1||p>65535) return "Port חייב להיות בין 1 ל-65535";
+    return "";
+  },
+  smsPass: function(v){
+    if(!v) return "";
+    if(v==="1234") return "⚠️ אסור להשתמש בסיסמת ברירת מחדל 1234";
+    if(v.length<4) return "סיסמה חייבת להכיל לפחות 4 תווים";
+    return "";
+  },
+};
+
+function validate(field, value){
+  return (VALIDATORS[field]||function(){return "";})(value);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════════════════════
+function doneCount(step){ return Object.values(S.checks[step]).filter(Boolean).length; }
+function totalCount(step){ return CHECKLISTS[step].length; }
+function stepComplete(step){ return doneCount(step)===totalCount(step); }
+function overallPct(){
+  var total=[1,2,3,4,5,6].reduce(function(a,s){return a+totalCount(s);},0);
+  var done =[1,2,3,4,5,6].reduce(function(a,s){return a+doneCount(s);},0);
+  return Math.round(done/total*100);
+}
+function nowStr(){
+  var d=new Date();
+  return d.toLocaleString("he-IL",{day:"2-digit",month:"2-digit",year:"numeric",
+    hour:"2-digit",minute:"2-digit",second:"2-digit"});
+}
+function esc(str){
+  return String(str||"")
+    .replace(/&/g,"&amp;").replace(/"/g,"&quot;")
+    .replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function flashSaveBadge(text){
+  var badge=document.getElementById("save-badge");
+  if(!badge) return;
+  var prev=badge.textContent||"💾 נשמר";
+  badge.textContent=text||"💾 נשמר";
+  badge.className="save-badge show";
+  clearTimeout(badge._ft);
+  badge._ft=setTimeout(function(){
+    badge.textContent=prev;
+    badge.className="save-badge";
+  },2200);
+}
+
+function gseDigitsOnly(v){
+  return String(v||"").replace(/\D/g,"");
+}
+function normalizeGseDigits(){
+  var d=gseDigitsOnly(S.gse);
+  if(d.length>5) d=d.slice(-5);
+  S.gse=d;
+}
+function gseFormatted(){
+  normalizeGseDigits();
+  var d=S.gse;
+  if(!d||d.length<4) return "";
+  return "GSE "+d;
+}
+function gseCfgFileName(){
+  normalizeGseDigits();
+  var d=S.gse;
+  if(!d||d.length<4) return "";
+  return "GSE_"+d+".cfg";
+}
+function exportVehicleTag(){
+  normalizeGseDigits();
+  var d=S.gse;
+  if(d&&d.length>=4) return d;
+  return S.imei||"LOG";
+}
+function toDateInputValue(raw){
+  var t=String(raw||"").trim();
+  if(!t) return "";
+  if(/^\d{4}-\d{2}-\d{2}$/.test(t)) return t;
+  var d=new Date(t);
+  if(!isNaN(d.getTime())){
+    var y=d.getFullYear();
+    var mo=d.getMonth()+1, da=d.getDate();
+    var pad=function(n){return (n<10?"0":"")+n;};
+    return y+"-"+pad(mo)+"-"+pad(da);
+  }
+  return "";
+}
+
+function categoryCodeEn(){
+  var m={
+    "גורר":"Towing",
+    "מטען":"Loader",
+    "סולם נוסעים מקורה":"Canopy",
+    "מזגן":"ACU",
+    "במת הרמה":"Stage",
+    "גנרטור":"GPU"
+  };
+  return m[S.division]||"GSE";
+}
+
+function suggestedDeviceName(){
+  normalizeGseDigits();
+  var digits=S.gse;
+  if(!digits||digits.length<4) return "";
+  return "GSE-"+categoryCodeEn()+"-"+digits;
+}
+
+function expectedCfgName(){
+  if(S.division==="גורר") return "J1730_GoldHoffer";
+  return "J1939_Motorized_Final";
+}
+
+function parseCfgText(text){
+  var numeric={}, header={};
+  String(text||"").split(";").forEach(function(tok){
+    tok=tok.trim();
+    if(!tok || tok.indexOf(":")<0) return;
+    var kv=tok.split(":");
+    var k=(kv.shift()||"").trim();
+    var v=kv.join(":").trim();
+    if(/^\d+$/.test(k)) numeric[k]=v;
+    else header[k]=v;
+  });
+  return {header:header, numeric:numeric};
+}
+
+var CFG_KNOWN_FIELDS = {
+  "2001":"apn","2002":"apn_username","2003":"apn_password","2004":"primary_server_domain","2005":"primary_server_port",
+  "2006":"primary_server_protocol","2007":"secondary_server_domain_or_ip","2008":"secondary_server_port",
+  "2009":"secondary_server_protocol","2010":"server_mode","13000":"fota_domain","13001":"fota_port",
+  "13002":"fota_period_min","13003":"fota_enabled"
+};
+var CFG_REQUIRED_VALUES = {
+  "2001":"internet.pelephone.net",
+  "2002":"pcl@3g",
+  "2004":"tracker.navixy.com",
+  "2005":"47776",
+  "2006":"0",
+  "2007":"79.177.133.243",
+  "2008":"15027",
+  "2009":"0",
+  "2010":"2",
+  "13000":"fm.teltonika.lt",
+  "13001":"5000",
+  "13002":"720",
+  "13003":"1"
+};
+function validateCfgValues(valuesById){
+  var ids=Object.keys(CFG_REQUIRED_VALUES);
+  var missing=[], mismatch=[];
+  ids.forEach(function(id){
+    if(!(id in valuesById)){ missing.push(id); return; }
+    var actual=String(valuesById[id]||"").trim();
+    var expected=String(CFG_REQUIRED_VALUES[id]||"").trim();
+    if(actual!==expected){
+      mismatch.push(id+"="+actual+" (expected "+expected+")");
+    }
+  });
+  return {missing:missing,mismatch:mismatch};
+}
+function parseQuickPreviewValues(text){
+  var out={};
+  String(text||"").split(/\r?\n/).forEach(function(line){
+    var m=line.match(/^\s*-\s*(\d+)\s*\|[^=]*=\s*([^\r\n(]+)(?:\s*\(|\s*$)/);
+    if(m) out[m[1]]=m[2].trim();
+  });
+  return out;
+}
+function renderCfgValidationRows(){
+  var vals=parseQuickPreviewValues(S.cfgViewerPreview||"");
+  var ids=Object.keys(CFG_REQUIRED_VALUES);
+  var rows=['<div style="margin-top:10px;border:1px solid #d7dbe1;border-radius:8px;overflow:hidden;">'
+    +'<div style="background:#eef2f7;padding:8px 10px;font-weight:700;font-size:12px;">'
+    +'Required CFG parameters (Expected vs Actual)</div>'];
+  ids.forEach(function(id){
+    var expected=String(CFG_REQUIRED_VALUES[id]||"");
+    var actual=(id in vals)?String(vals[id]||""):"";
+    var ok=(actual===expected);
+    var status=ok?"OK":(actual?"Mismatch":"Missing");
+    var bg=ok?"#f3fff8":"#fff6f6";
+    var color=ok?"#0f5132":"#842029";
+    rows.push('<div style="padding:7px 10px;border-top:1px solid #edf0f3;background:'+bg+';font-size:12px;">'
+      +'<span class="mono">'+id+'</span> | '
+      +esc(CFG_KNOWN_FIELDS[id]||"unknown")
+      +' | expected: <span class="mono">'+esc(expected)+'</span>'
+      +' | actual: <span class="mono">'+esc(actual||"—")+'</span>'
+      +' | <strong style="color:'+color+';">'+status+'</strong>'
+      +'</div>');
+  });
+  rows.push('</div>');
+  return rows.join("");
+}
+function cfgMappedValue(fieldId, raw){
+  var PROTOCOL_MAP={"0":"TCP","1":"UDP","2":"MQTT"};
+  var BOOL_MAP={"0":"False","1":"True"};
+  var SERVER_MODE_MAP={"0":"Disabled","1":"Backup","2":"Duplicate"};
+  if(fieldId==="2006"||fieldId==="2009") return PROTOCOL_MAP[raw]||raw;
+  if(fieldId==="2010") return SERVER_MODE_MAP[raw]||raw;
+  if(fieldId==="13003") return BOOL_MAP[raw]||raw;
+  return raw;
+}
+function buildCfgPreviewText(filePath, parsed){
+  var n=parsed.numeric||{}, h=parsed.header||{};
+  var ids=["2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","13000","13001","13002","13003"];
+  var lines=[
+    "Loaded file: "+(filePath||""),
+    "Header fields: "+Object.keys(h).length,
+    "Numeric fields: "+Object.keys(n).length,
+    "",
+    "Quick preview:"
+  ];
+  ids.forEach(function(id){
+    if(!(id in n)) return;
+    var name=CFG_KNOWN_FIELDS[id]||"unknown";
+    var raw=n[id];
+    var mapped=cfgMappedValue(id, raw);
+    lines.push("- "+id+" | "+name+" = "+raw+" ("+mapped+")");
+  });
+  return lines.join("\n");
+}
+function extractNavixyFromText(text){
+  var t=String(text||"");
+  var dm=t.match(/^\s*-\s*2004\s*\|[^=]*=\s*([^\r\n(]+)(?:\s*\(|\s*$)/m);
+  var pm=t.match(/^\s*-\s*2005\s*\|[^=]*=\s*([^\r\n(]+)(?:\s*\(|\s*$)/m);
+  return {
+    domain: dm?dm[1].trim():"",
+    port: pm?pm[1].trim():""
+  };
+}
+function applyNavixyFromCfg(domain, port){
+  var d=String(domain||"").trim();
+  var p=String(port||"").trim();
+  if(d){
+    S.cfgNavixyDomain=d;
+    if(S.navixeIp!==d){
+      S.navixeIp=d;
+      S.navixeApproved="";
+    }
+  }
+  if(p){
+    S.cfgNavixyPort=p;
+    if(S.navixePort!==p){
+      S.navixePort=p;
+      S.navixeApproved="";
+    }
+  }
+}
+async function decodeCfgFile(file){
+  var ab=await file.arrayBuffer();
+  var bytes=new Uint8Array(ab);
+  try{
+    if(typeof DecompressionStream!=="undefined"){
+      var ds=new DecompressionStream("gzip");
+      var stream=new Blob([bytes]).stream().pipeThrough(ds);
+      var resp=new Response(stream);
+      return await resp.text();
+    }
+  }catch(e){}
+  return new TextDecoder("utf-8",{fatal:false}).decode(bytes);
+}
+
+function runCfgAutoCheck(fileName, text){
+  var expected=expectedCfgName();
+  var parsed=parseCfgText(text);
+  var n=parsed.numeric||{};
+  var req=["2001","2002","2004","2005","2006","2007","2008","2009","2010","13000","13001","13002","13003"];
+  var check=validateCfgValues(n);
+  var missing=check.missing;
+  var mismatch=check.mismatch;
+  var fileOk=(String(fileName||"").toLowerCase().indexOf(expected.toLowerCase())>=0);
+  var dateOk=/\d{8}/.test(String(fileName||""));
+  var ok=(missing.length===0)&&(mismatch.length===0)&&fileOk&&dateOk;
+  var details=[];
+  details.push("Expected CFG: "+expected);
+  details.push("Selected file: "+(fileName||"—"));
+  details.push(fileOk?"Filename rule: OK":"Filename rule: MISMATCH");
+  details.push(dateOk?"Date in filename: OK":"Date in filename: MISSING");
+  details.push(missing.length?("Missing params: "+missing.join(", ")):"Missing params: none");
+  details.push(mismatch.length?("Value mismatch: "+mismatch.join(", ")):"Value mismatch: none");
+  S.cfgFileName=fileName||"";
+  S.cfgLoadedFile=fileName||S.cfgLoadedFile;
+  S.cfgViewerPreview=buildCfgPreviewText(fileName||"", parsed);
+  applyNavixyFromCfg(n["2004"]||"", n["2005"]||"");
+  if(!S.cfgNavixyDomain || !S.cfgNavixyPort){
+    var fromPreview=extractNavixyFromText(S.cfgViewerPreview);
+    applyNavixyFromCfg(fromPreview.domain, fromPreview.port);
+  }
+  S.cfgAutoStatus=ok?"pass":"fail";
+  S.cfgAutoReport=details.join(" | ");
+  if(ok) S.cfgVerified="yes";
+}
+
+function runPySummaryCheck(text){
+  var t=String(text||"");
+  var expected=expectedCfgName();
+  var parsedValues=parseQuickPreviewValues(t);
+  var check=validateCfgValues(parsedValues);
+  var miss=check.missing;
+  var mismatch=check.mismatch;
+
+  var loadedMatch=t.match(/Loaded file:\s*(.+)/i);
+  var filePath=loadedMatch?loadedMatch[1].trim():"";
+  if(filePath) S.cfgLoadedFile=filePath;
+  var fileName=filePath?filePath.split(/[\\\/]/).pop():"";
+  var lower=fileName.toLowerCase();
+  var baseOk=lower.indexOf(expected.toLowerCase())===0;
+  var dateOk=/\d{8}/.test(fileName);
+  var extOk=/\.cfg$/i.test(fileName);
+
+  var ok=(miss.length===0)&&(mismatch.length===0)&&baseOk&&dateOk&&extOk;
+  var details=[];
+  details.push("Expected CFG: "+expected);
+  details.push("Loaded file: "+(fileName||"—"));
+  details.push(baseOk?"Prefix rule: OK":"Prefix rule: MISMATCH");
+  details.push(dateOk?"Date in filename: OK":"Date in filename: MISSING");
+  details.push(extOk?"Extension: .cfg":"Extension: INVALID");
+  details.push(miss.length?("Missing preview IDs: "+miss.join(", ")):"Missing preview IDs: none");
+  details.push(mismatch.length?("Preview value mismatch: "+mismatch.join(", ")):"Preview value mismatch: none");
+
+  S.cfgAutoStatus=ok?"pass":"fail";
+  S.cfgAutoReport=details.join(" | ");
+  S.cfgViewerPreview=t;
+  var fromPy=extractNavixyFromText(t);
+  applyNavixyFromCfg(fromPy.domain, fromPy.port);
+  if(ok) S.cfgVerified="yes";
+}
+
+function syncDerivedNames(){
+  var sn=suggestedDeviceName();
+  if(!S.deviceName && sn) S.deviceName=sn;
+  if(S.deviceName) S.contactName=S.deviceName;
+}
+
+function formGateMessages(step){
+  var m=[];
+  if(step===1){
+    normalizeGseDigits();
+    var gd=S.gse;
+    if(!gd||gd.length<4||gd.length>5) m.push("GSE — 4–5 ספרות (מזהה ELAL)");
+    if(!(S.division||"").trim()) m.push("Category");
+  } else if(step===2){
+    if(validate("imei",S.imei)) m.push("IMEI");
+    if(!(S.deviceName||"").trim()) m.push("שם FOTAWEB");
+    else if(validate("deviceName",S.deviceName)) m.push("שם FOTAWEB");
+    if(validate("simNum",S.simNum)) m.push("SIM MSISDN בטראקר");
+    if(validate("smsPass",S.smsPass)) m.push("סיסמת SMS לא תקינה");
+  } else if(step===4){
+    if(S.cfgVerified!=="yes" && S.cfgAutoStatus!=="pass") m.push("אישור אימות קונפיג ב-CFG Viewer");
+  } else if(step===5){
+    if(!(S.navixeIp||"").trim()) m.push("Server IP / Domain לנביקסי");
+    if(validate("navixePort",S.navixePort)) m.push("Port נביקסי");
+    if(S.cfgNavixyDomain && S.navixeApproved!=="yes") m.push("אישור שימוש בנתוני Navixy מה-Registration (2004/2005)");
+  }
+  return m;
+}
+
+function canAdvanceFromStep(step){
+  return stepComplete(step)&&formGateMessages(step).length===0;
+}
+
+// ─── Inherited-data banner ────────────────────────────────────────────────────
+// Shows data from previous steps so the technician doesn't re-enter it.
+function renderInheritedBanner(step){
+  var items=[], bg="", color="", title="";
+
+  if(step===2){
+    if(gseFormatted()) items.push(["GSE (ELAL)", gseFormatted()]);
+    if(S.division)     items.push(["Category", S.division]);
+    if(S.energy)       items.push(["Energy", S.energy]);
+    bg="#FFF3CD"; color="#E06000"; title="📋 פרטי כלי (שלב 1):";
+  } else if(step===3){
+    if(S.imei)         items.push(["IMEI", S.imei]);
+    if(S.deviceName)   items.push(["FOTAWEB", S.deviceName]);
+    if(gseFormatted()) items.push(["GSE (ELAL)", gseFormatted()]);
+    if(S.division)     items.push(["Category", S.division]);
+    if(S.simNum)       items.push(["SIM", S.simNum]);
+    bg="#D0E8FF"; color="#0D6EFD"; title="🔌 מכשיר המותקן — לעיון בזמן חיווט:";
+  } else if(step===4){
+    if(S.imei)         items.push(["IMEI", S.imei]);
+    if(S.deviceName)   items.push(["FOTAWEB", S.deviceName]);
+    if(gseFormatted()) items.push(["GSE (ELAL)", gseFormatted()]);
+    if(S.simNum)       items.push(["SIM", S.simNum]);
+    bg="#EDE7F6"; color="#6F42C1"; title="📋 פרטי מכשיר לרישום (משלבים 1–2):";
+  } else if(step===5){
+    if(S.imei)         items.push(["IMEI", S.imei]);
+    if(S.deviceName)   items.push(["FOTAWEB", S.deviceName]);
+    if(gseFormatted()) items.push(["GSE (ELAL)", gseFormatted()]);
+    if(S.simNum)       items.push(["SIM", S.simNum]);
+    bg="#EDE7F6"; color="#6F42C1"; title="📋 פרטי מכשיר לרישום (משלבים 1–4):";
+  } else if(step===6){
+    if(S.imei)         items.push(["IMEI", S.imei]);
+    if(S.deviceName)   items.push(["FOTAWEB", S.deviceName]);
+    if(gseFormatted()) items.push(["GSE (ELAL)", gseFormatted()]);
+    if(S.navixeIp)     items.push(["נביקסי", S.navixeIp+":"+S.navixePort]);
+    bg="#D1F0E0"; color="#198754"; title="📊 פרטי מכשיר לאימות:";
+  }
+
+  if(!items.length) return "";
+  return '<div class="inh-banner" style="background:'+bg+';border-right:4px solid '+color+';">'
+    +'<div class="inh-banner-title" style="color:'+color+';">'+title+'</div>'
+    +'<div class="inh-rows">'
+    +items.map(function(kv){
+      return '<div class="inh-cell"><span style="color:#666;">'+kv[0]+':</span> '
+        +'<span class="inh-val">'+esc(kv[1])+'</span></div>';
+    }).join("")
+    +'</div></div>';
+}
+
+// ─── CSV Export ───────────────────────────────────────────────────────────────
+function buildCSV(){
+  var ts=new Date().toISOString();
+  var rows=[];
+  rows.push(["FMC650 Installation Log"]);
+  rows.push(["תאריך שעה",ts]);
+  rows.push(["טכנאי",S.techName,"טלפון",S.techPhone]);
+  rows.push([]);
+  rows.push(["=== פרטי כלי ==="]);
+  rows.push(["GSE / ELAL license",gseFormatted()]);
+  rows.push([]);
+  rows.push(["=== ELAL Upgrade.xls — Sheet_1 ==="]);
+  rows.push(["Category",S.division]);
+  rows.push(["GSE digits",S.gse]);
+  rows.push(["Energy",S.energy]);
+  rows.push(["Energy capacity — tank [L] / battery [kW]",S.tankBatterySpec]);
+  rows.push(["Installation Date",S.installationDate]);
+  rows.push(["Name (Navixy/FOTAWEB)",S.deviceName]);
+  rows.push(["IMEI",S.imei]);
+  rows.push(["Contact Name",S.contactName]);
+  rows.push(["Phone Number",S.excelPhone]);
+  rows.push([]);
+  rows.push(["=== Teltonika Activation ==="]);
+  rows.push(["Expected Config",expectedCfgName()]);
+  rows.push(["Loaded CFG File",S.cfgLoadedFile]);
+  rows.push(["CFG Verified",S.cfgVerified==="yes"?"כן":"לא"]);
+  rows.push([]);
+  rows.push(["=== SIM / SMS (טראקר) ==="]);
+  rows.push(["SIM MSISDN",S.simNum]);
+  rows.push(["ICCID",S.iccid]);
+  rows.push(["סיסמת SMS",S.smsPass?"הוגדרה":"לא הוגדרה"]);
+  rows.push([]);
+  rows.push(["=== נביקסי ==="]);
+  rows.push(["Server IP",S.navixeIp]);
+  rows.push(["Port",S.navixePort]);
+  rows.push([]);
+  rows.push(["=== תוצאות צ'קליסטים ==="]);
+  rows.push(["שלב","מזהה","תיאור","תוצאה"]);
+  [1,2,3,4,5,6].forEach(function(step){
+    CHECKLISTS[step].forEach(function(item){
+      rows.push(["שלב "+step+": "+STEPS_META[step-1].label,
+        item.id,item.t,S.checks[step][item.id]?"✓ עבר":"✗ לא בוצע"]);
+    });
+  });
+  rows.push([]);
+  rows.push(["=== סיכום ==="]);
+  [1,2,3,4,5,6].forEach(function(s){
+    rows.push(["שלב "+s,doneCount(s)+"/"+totalCount(s),stepComplete(s)?"הושלם":"לא הושלם"]);
+  });
+  var allOk=[1,2,3,4,5,6].every(stepComplete);
+  rows.push(["תוצאה כללית",allOk?"✅ ההתקנה הושלמה בהצלחה":"⚠️ ההתקנה לא הושלמה"]);
+  rows.push([]);
+  rows.push(["הערות",S.notes]);
+  var BOM="\uFEFF";
+  return BOM+rows.map(function(r){
+    return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"';}).join(",");
+  }).join("\r\n");
+}
+
+function exportCSV(){
+  var csv=buildCSV();
+  var fname="FMC650_"+exportVehicleTag()+"_"+new Date().toISOString().slice(0,10)+".csv";
+  try {
+    var blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url;a.download=fname;
+    document.body.appendChild(a);a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  } catch(e){
+    var a2=document.createElement("a");
+    a2.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
+    a2.download=fname;
+    document.body.appendChild(a2);a2.click();
+    document.body.removeChild(a2);
+  }
+}
+
+function copyToClipboard(){
+  var lines=[
+    "FMC650 — סיכום התקנה","תאריך: "+nowStr(),
+    "טכנאי: "+(S.techName||"—"),
+    "GSE (ELAL): "+(gseFormatted()||"—"),
+    "Category: "+(S.division||"—"),
+    "IMEI: "+(S.imei||"—"),"FOTAWEB: "+(S.deviceName||"—"),
+    "נביקסי: "+(S.navixeIp?S.navixeIp+":"+S.navixePort:"—"),
+    "",
+    [1,2,3,4,5,6].map(function(s){return "שלב "+s+": "+doneCount(s)+"/"+totalCount(s);}).join(" | "),
+    [1,2,3,4,5,6].every(stepComplete)?"✅ הושלם":"⚠️ חלקי",
+  ].join("\n");
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(lines)
+      .then(function(){alert("✅ הסיכום הועתק ללוח");})
+      .catch(function(){fallbackCopy(lines);});
+  } else { fallbackCopy(lines); }
+}
+
+function fallbackCopy(text){
+  var ta=document.createElement("textarea");
+  ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand("copy");alert("✅ הסיכום הועתק ללוח");}
+  catch(e){alert("לא ניתן להעתיק אוטומטית — בחר הכל ידנית");}
+  document.body.removeChild(ta);
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════════════════════════════
+function render(){
+  document.getElementById("app").innerHTML=S.done?renderDone():renderWizard();
+  bindEvents();
+}
+
+// ─── DONE SCREEN ──────────────────────────────────────────────────────────────
+function renderDone(){
+  var allOk=[1,2,3,4,5,6].every(stepComplete);
+  return '<div class="done-hdr">'
+    +'<div class="big-icon">'+(allOk?"🎉":"⚠️")+'</div>'
+    +'<h2>'+(allOk?"ההתקנה הושלמה בהצלחה!":"ההתקנה הסתיימה — יש סעיפים פתוחים")+'</h2>'
+    +'<p>'+nowStr()+' | '+(S.techName||"טכנאי")+'</p>'
+    +'<div style="margin-top:10px;background:rgba(255,255,255,.18);border-radius:20px;'
+      +'padding:4px 16px;font-size:13px;display:inline-block;">'+overallPct()+'% הושלמו</div>'
+    +'</div>'
+
+    +'<div class="card">'
+      +'<div style="font-weight:700;color:#1A3A5C;font-size:16px;margin-bottom:14px;">📋 פרטי הכלי והמכשיר</div>'
+      +[
+        ["GSE (ELAL)",gseFormatted()],["Category",S.division],
+        ["ספרות GSE",S.gse],["Energy",S.energy],
+        ["Tank [L] / Battery [kW]",S.tankBatterySpec],["Installation Date",S.installationDate],
+        ["IMEI",S.imei],["שם FOTAWEB",S.deviceName],["Contact Name",S.contactName],["Phone (Excel)",S.excelPhone],
+        ["SIM",S.simNum],["ICCID",S.iccid],
+        ["נביקסי",S.navixeIp?S.navixeIp+":"+S.navixePort:"—"],
+      ].map(function(kv){
+        return '<div class="summary-row"><span class="summary-key">'+kv[0]+'</span>'
+          +'<span class="summary-val">'+esc(kv[1]||"—")+'</span></div>';
+      }).join("")
+    +'</div>'
+
+    +'<div class="card">'
+      +'<div style="font-weight:700;color:#1A3A5C;font-size:16px;margin-bottom:12px;">📊 סיכום שלבים</div>'
+      +[1,2,3,4,5,6].map(function(s){
+        var ok=stepComplete(s),sm=STEPS_META[s-1];
+        return '<div style="display:-webkit-flex;display:flex;justify-content:space-between;'
+          +'align-items:center;padding:9px 12px;border-radius:8px;margin-bottom:6px;'
+          +'background:'+(ok?LT[sm.col]:"#f8f9fa")+';border:1.5px solid '+(ok?sm.bg:"#dee2e6")+';">'
+          +'<span style="font-weight:700;color:'+(ok?sm.bg:"#555")+';">'
+            +sm.icon+' שלב '+s+': '+sm.label+'</span>'
+          +'<span style="background:'+(ok?sm.bg:"#adb5bd")+';color:#fff;'
+            +'border-radius:12px;padding:2px 10px;font-size:12px;font-weight:700;">'
+            +doneCount(s)+'/'+totalCount(s)+' ✓</span></div>';
+      }).join("")
+      +(S.notes?'<div style="background:#f8f9fa;border-radius:8px;padding:10px;'
+        +'font-size:13px;color:#555;margin-top:8px;"><strong>הערות:</strong> '+esc(S.notes)+'</div>':"")
+    +'</div>'
+
+    +'<div style="margin-bottom:14px;">'
+      +'<button class="btn btn-primary" id="btn-csv" style="background:#198754;margin-bottom:8px;">📥 שמור לוג CSV</button>'
+      +'<button class="btn btn-secondary" id="btn-copy" style="margin-bottom:8px;">📋 העתק סיכום</button>'
+      +'<button class="btn btn-secondary" id="btn-print" style="margin-bottom:8px;">🖨️ הדפס</button>'
+      +'<button class="btn btn-secondary" id="btn-restart">← התחל התקנה חדשה</button>'
+    +'</div>';
+}
+
+// ─── WIZARD ───────────────────────────────────────────────────────────────────
+function renderWizard(){
+  var s=S.step,sm=STEPS_META[s-1];
+  var dc=doneCount(s),tc=totalCount(s);
+  var pct=Math.round(dc/tc*100),complete=(dc===tc),overall=overallPct();
+  var gateMsgs=formGateMessages(s),gateOk=canAdvanceFromStep(s);
+
+  return ''
+    +'<div class="hdr">'
+      +'<div style="-webkit-flex:1;flex:1;">'
+        +'<div style="font-size:11px;opacity:.7;margin-bottom:2px;">אשף התקנה FMC650</div>'
+        +'<div class="hdr-title">TELTONIKA FMC650</div>'
+        +'<div class="hdr-sub">שלב '+s+' מתוך 6 — '+sm.label+'</div>'
+        +((S.techName||"").trim()||(S.techPhone||"").trim()
+          ?'<div class="hdr-tech">👷 '+esc((S.techName||"").trim()||"—")
+            +((S.techPhone||"").trim()?" · "+esc(S.techPhone.trim()):"")+'</div>':"")
+        +'<div class="hdr-overall"><div class="hdr-overall-fill" style="width:'+overall+'%;"></div></div>'
+        +'<div class="hdr-overall-lbl">'+overall+'% כולל</div>'
+      +'</div>'
+      +'<div class="hdr-icon">'+sm.icon+'</div>'
+    +'</div>'
+
+    +'<div class="step-nav" id="step-nav">'
+      +STEPS_META.map(function(m){
+        var done=S.completed.indexOf(m.id)>=0,act=m.id===s;
+        return '<button class="step-btn'+(act?" active":"")+ '" data-goto="'+m.id+'"'
+          +' style="border-color:'+(done||act?m.bg:"#dee2e6")+';'
+          +'background:'+(done?m.bg:act?LT[m.col]:"#fff")+';'
+          +'color:'+(done?"#fff":act?m.bg:"#777")+';'
+          +'box-shadow:'+(act?'0 2px 10px '+m.bg+'55':"none")+';">'
+          +'<span class="s-icon">'+(done?"✅":m.icon)+'</span>'
+          +'<span>'+m.id+'. '+m.label+'</span>'
+          +'<span class="step-count">'+doneCount(m.id)+'/'+totalCount(m.id)+'</span>'
+          +'</button>';
+      }).join("")
+    +'</div>'
+    +'<div class="swipe-hint">← החלק לניווט בין שלבים →</div>'
+
+    +'<div class="card" id="main-card">'
+      +'<div class="step-hdr" style="border-color:'+sm.bg+';">'
+        +'<h2>'+STEP_TITLES[s]+'</h2>'
+        +'<p>'+STEP_SUBS[s]+'</p>'
+      +'</div>'
+
+      +'<div class="wizard-toolbar">'
+        +'<button type="button" class="btn-mini" id="btn-clear-form">🧹 נקה טופס</button>'
+        +'<button type="button" class="btn-mini" id="btn-save-new">💾 שמור CSV וחדש</button>'
+      +'</div>'
+
+      +'<div class="prog-label">'
+        +'<span>התקדמות שלב '+s+'</span>'
+        +'<span style="color:'+sm.bg+';font-weight:700;">'+pct+'%</span>'
+      +'</div>'
+      +'<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%;background:'+sm.bg+';"></div></div>'
+
+      +INFOS[s].map(function(x){
+        return '<div class="info-card" style="background:'+LT[sm.col]+';border-right:4px solid '+sm.bg+';">'
+          +'<span style="font-size:18px;-webkit-flex-shrink:0;flex-shrink:0;margin-left:10px;">'+x.i+'</span>'
+          +'<span style="font-size:13px;color:#333;line-height:1.6;">'+x.t+'</span>'
+          +'</div>';
+      }).join("")
+
+      // Inherited-data banner (steps 2-6)
+      +(s>=2?renderInheritedBanner(s):"")
+
+      // Step-specific forms
+      +(s===1?renderForm1():"")
+      +(s===2?renderForm2():"")
+      +(s===4?renderForm4():"")
+      +(s===5?renderForm5():"")
+      +(s===6?renderForm6():"")
+
+      +'<div style="display:-webkit-flex;display:flex;justify-content:space-between;'
+        +'align-items:center;margin:16px 0 10px;">'
+        +'<span style="font-weight:700;font-size:15px;color:#1A3A5C;">✅ רשימת תיוג</span>'
+        +'<span class="badge" style="background:'+(gateOk?sm.bg:(complete?"#fd7e14":"#adb5bd"))+';color:#fff;">'
+          +dc+' / '+tc+(gateOk?" ✓":" …")+'</span>'
+      +'</div>'
+      +CHECKLISTS[s].map(function(item){
+        return '<div class="chk-item'+(S.checks[s][item.id]?" done":"")
+          +'" data-chk="'+s+'" data-id="'+item.id+'">'
+          +'<div class="chk-box">'+(S.checks[s][item.id]?"✓":"")+'</div>'
+          +'<span class="chk-text">'+item.t+'</span>'
+          +'</div>';
+      }).join("")
+
+      +'<div class="form-group" style="margin-top:14px;">'
+        +'<label class="form-label">📝 הערות / ממצאים</label>'
+        +'<textarea id="notes" rows="3" class="form-input"'
+          +' placeholder="רשום כל הערה טכנית רלוונטית...">'+esc(S.notes)+'</textarea>'
+      +'</div>'
+
+      +(!complete
+        ?'<div class="warn-box"><span>⚠️</span><span>נותרו <strong>'+(tc-dc)+'</strong> סעיפים לסימון לפני מעבר לשלב הבא.</span></div>'
+        :(gateMsgs.length
+          ?'<div class="warn-box"><span>📋</span><span class="gate-hint"><strong>השלם שדות נדרשים:</strong> '
+            +gateMsgs.map(function(x){return esc(x);}).join(" · ")+'</span></div>'
+          :""))
+
+      +'<div class="btn-row" style="margin-top:4px;">'
+        +(s>1?'<button class="btn btn-secondary" id="btn-prev"'
+          +' style="-webkit-flex:0 0 auto;flex:0 0 auto;width:auto;padding:13px 18px;">← חזור</button>':"")
+        +'<button class="btn btn-primary" id="btn-next"'
+          +' style="background:'+sm.bg+';"'+(gateOk?"":" disabled")+'>'
+          +(s===6?"🎉 סיים ואשר התקנה":"המשך לשלב "+(s+1)+": "+STEPS_META[s].label+" →")
+        +'</button>'
+      +'</div>'
+    +'</div>'
+
+    +(s===1?'<div class="card">'
+      +'<div style="font-weight:700;color:#1A3A5C;margin-bottom:12px;">👷 פרטי טכנאי</div>'
+      +'<div class="form-grid">'
+        +'<div class="form-group">'
+          +'<label class="form-label">שם הטכנאי</label>'
+          +'<input id="techName" class="form-input" value="'+esc(S.techName)+'"'
+            +' placeholder="ישראל ישראלי" autocomplete="name">'
+        +'</div>'
+        +'<div class="form-group">'
+          +'<label class="form-label">טלפון</label>'
+          +'<input id="techPhone" class="form-input mono" value="'+esc(S.techPhone)+'"'
+            +' placeholder="+972501234567" type="tel" inputmode="tel" autocomplete="tel">'
+        +'</div>'
+      +'</div>'
+    +'</div>':"")
+
+    +'<div class="mini-status">'
+      +STEPS_META.map(function(m){
+        var done=S.completed.indexOf(m.id)>=0,act=s===m.id;
+        return '<div class="mini-chip"'
+          +' style="background:'+(done?m.bg:act?LT[m.col]:"#fff")+';'
+          +'color:'+(done?"#fff":act?m.bg:"#888")+';'
+          +'border-color:'+(done||act?m.bg:"#dee2e6")+';'
+          +'font-weight:'+(act?700:400)+';">'
+          +m.icon+' '+doneCount(m.id)+'/'+totalCount(m.id)+'</div>';
+      }).join("")
+    +'</div>';
+}
+
+// ─── Step forms ───────────────────────────────────────────────────────────────
+
+function fieldCls(key, val){
+  var err=validate(key,val);
+  if(err) return " invalid";
+  if(val&&!err) return " valid";
+  return "";
+}
+function hintHtml(key, val){
+  var err=validate(key,val);
+  if(err) return '<div class="form-err" data-hint="'+key+'">⚠️ '+err+'</div>';
+  var hints={
+    imei:val?"✅ IMEI תקין":"ממדבקה/Configurator",
+    deviceName:val?"✅ פורמט תקין":"פורמט: GSE-ACU-5032",
+    simNum:val?"✅ מספר טלפון תקין":"מספר טלפון 9–15 ספרות (אפשר +)",
+    vin:val?"✅ VIN תקין ("+val.length+"/17)":"17 תווים",
+  };
+  var h=hints[key]||"";
+  return h?'<div class="form-hint" data-hint="'+key+'">'+h+'</div>':"";
+}
+
+function renderSelectOptions(arr, current, withEmpty, emptyLabel){
+  var out="";
+  if(withEmpty){
+    out+='<option value="">'+(emptyLabel||"—")+'</option>';
+  }
+  for(var i=0;i<arr.length;i++){
+    var opt=arr[i];
+    out+='<option value="'+esc(opt)+'"'+(current===opt?" selected":"")+'>'+esc(opt)+'</option>';
+  }
+  return out;
+}
+
+function divisionOptionList(){
+  var arr=DIVISION_OPTIONS.slice();
+  if(S.division && arr.indexOf(S.division)<0) arr.unshift(S.division);
+  return arr;
+}
+
+// Step 1 — Vehicle details
+function renderForm1(){
+  normalizeGseDigits();
+  var sug=suggestedDeviceName();
+  var gDisp=gseFormatted();
+  var gCfg=gseCfgFileName();
+  return '<div style="background:#f4f6f8;border-radius:10px;padding:14px;margin:14px 0;">'
+    +'<div style="font-weight:700;color:#1A3A5C;margin-bottom:4px;">🚛 פרטי הכלי (מיושר ל-ELAL Upgrade.xls)</div>'
+    +'<div class="form-hint" style="margin-bottom:10px;">שדות עם * נדרשים יחד עם סימון כל צ\'קליסט השלב לפני המשך.</div>'
+    +'<div class="form-grid">'
+      +'<div class="form-group">'
+        +'<label class="form-label req">Category</label>'
+        +'<select id="division" class="form-input'+(S.division?" valid":"")+'">'
+          +renderSelectOptions(divisionOptionList(), S.division, true, "— בחר Category —")
+        +'</select>'
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label req">GSE (מספר רישיון ELAL)</label>'
+        +'<input id="gse" class="form-input mono'+(S.gse&&S.gse.length>=4?" valid":"")+'"'
+          +' value="'+esc(S.gse)+'" placeholder="5032" maxlength="5"'
+          +' inputmode="numeric" pattern="[0-9]*" autocomplete="off">'
+        +'<div class="form-hint">'+(gDisp?("מוצג כ: <strong>"+esc(gDisp)+"</strong> — קובץ: "+esc(gCfg))
+          :("הזן 4–5 ספרות בלבד (למשל 5032) — יוצג <strong>GSE 5032</strong>"))+'</div>'
+        +(gseFormatted()?'<div class="form-hint">Name אוטומטי: <strong>'+esc(suggestedDeviceName())+'</strong></div>':"")
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label">Energy</label>'
+        +'<select id="energy" class="form-input'+(S.energy?" valid":"")+'">'
+          +renderSelectOptions(ENERGY_TYPE_OPTIONS, S.energy, true, "— בחר Energy —")
+        +'</select>'
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label">נפח מכל דלק [L] / גודל סוללה [kW]</label>'
+        +'<div class="form-hint" style="margin-bottom:4px;">Energy capacity / fuel tank volume [L] or battery size [kW]</div>'
+        +'<input id="tankBatterySpec" class="form-input" value="'+esc(S.tankBatterySpec)+'"'
+          +' placeholder="למשל 200 L או 150 kW">'
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label">Installation Date</label>'
+        +'<input type="date" id="installationDate" class="form-input" value="'+esc(toDateInputValue(S.installationDate))+'">'
+      +'</div>'
+    +'</div>'
+    +(S.gse&&S.gse.length>=4&&S.division
+      ?'<div style="background:#fff3cd;border-radius:8px;padding:10px 12px;font-size:12px;'
+        +'margin-top:8px;color:#856404;">'
+        +(sug
+          ?'<div style="font-family:\'Courier New\';direction:ltr;text-align:left;">שם FOTAWEB מוצע: '
+            +esc(sug)+'</div>'
+            +'<button type="button" class="btn-mini" id="btn-suggest-fotaweb" style="margin-top:8px;">'
+            +'החל כשם FOTAWEB בשלב 2</button>'
+            +'<div class="form-hint" style="margin-top:6px;color:#856404;">מבוסס על Category (English) + ספרות GSE. ניתן לערוך ידנית בשלב FOTAWEB.</div>'
+          :'<div class="form-hint" style="color:#856404;">הזן GSE עם מספר (למשל GE5039) כדי לחשב שם FOTAWEB אוטומטית.</div>')
+      +'</div>'
+      :"")
+    +'</div>';
+}
+
+// Step 2 — FOTAWEB
+function renderForm2(){
+  syncDerivedNames();
+  return '<div style="background:#f4f6f8;border-radius:10px;padding:14px;margin:14px 0;">'
+    +'<div style="font-weight:700;color:#1A3A5C;margin-bottom:12px;">📝 פרטי רישום FOTAWEB</div>'
+    +'<div class="form-grid">'
+      +'<div class="form-group">'
+        +'<label class="form-label req">IMEI (15 ספרות)</label>'
+        +'<input id="imei" class="form-input mono'+fieldCls("imei",S.imei)+'"'
+          +' value="'+esc(S.imei)+'" placeholder="351456789012345"'
+          +' type="tel" inputmode="numeric" maxlength="15" autocomplete="off">'
+        +hintHtml("imei",S.imei)
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label req">שם FOTAWEB (Name ב-Excel)</label>'
+        +'<input id="deviceName" class="form-input mono'+fieldCls("deviceName",S.deviceName)+'"'
+          +' value="'+esc(S.deviceName)+'" placeholder="GSE-ACU-5033" autocomplete="off">'
+        +hintHtml("deviceName",S.deviceName)
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label req">SIM MSISDN (בטראקר)</label>'
+        +'<input id="simNum" class="form-input mono'+fieldCls("simNum",S.simNum)+'" value="'+esc(S.simNum)+'"'
+          +' placeholder="+972501234567" type="tel" inputmode="tel" autocomplete="off">'
+        +hintHtml("simNum",S.simNum)
+        +'<div class="form-hint">מספר ה-SIM בפועל במכשיר — לא בהכרח כמו Phone Number באקסל</div>'
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label">ICCID</label>'
+        +'<input id="iccid" class="form-input mono'+fieldCls("iccid",S.iccid)+'"'
+          +' value="'+esc(S.iccid)+'" placeholder="8997201234567890123"'
+          +' type="tel" inputmode="numeric" maxlength="20" autocomplete="off">'
+        +hintHtml("iccid",S.iccid)
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label">סיסמת SMS (לא 1234!) — אופציונלי</label>'
+        +'<input id="smsPass" class="form-input'+fieldCls("smsPass",S.smsPass)+'"'
+          +' value="'+esc(S.smsPass)+'" placeholder="MySecure2025" autocomplete="new-password">'
+        +hintHtml("smsPass",S.smsPass)
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label">Contact Name (מ-Excel)</label>'
+        +'<input id="contactName" class="form-input mono" value="'+esc(S.contactName)+'"'
+          +' placeholder="GSE-ACU-5033" autocomplete="off" readonly>'
+        +'<div class="form-hint">יורש אוטומטית את Name (FOTAWEB)</div>'
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label">Phone Number (מ-Excel)</label>'
+        +'<input id="excelPhone" class="form-input mono" value="'+esc(S.excelPhone)+'"'
+          +' placeholder="+972..." type="tel" inputmode="tel" autocomplete="off">'
+        +'<div class="form-hint">עמודת האקסל — יכול להיות קו תמיכה / איש קשר ולא SIM</div>'
+      +'</div>'
+    +'</div>'
+    +(S.deviceName&&S.imei&&!validate("imei",S.imei)
+      ?'<div style="background:#e0f5f5;border-radius:8px;padding:10px;font-size:12px;'
+        +'direction:ltr;font-family:\'Courier New\';margin-top:4px;color:#0D7377;">'
+        +'FOTAWEB Device: '+esc(S.deviceName)+' | IMEI: '+esc(S.imei)+'</div>'
+      :"")
+    +'</div>';
+}
+
+// Step 4 — Teltonika activation
+function renderForm4(){
+  var expected=expectedCfgName();
+  return '<div style="background:#f4f6f8;border-radius:10px;padding:14px;margin:14px 0;">'
+    +'<div style="font-weight:700;color:#1A3A5C;margin-bottom:12px;">⚙️ אקטיבציה — טלטוניקה</div>'
+    +'<div class="form-grid">'
+      +'<div class="form-group">'
+        +'<label class="form-label req">קובץ קונפיגורציה נדרש</label>'
+        +'<input class="form-input mono" value="'+esc(expected)+'" readonly>'
+      +'</div>'
+      +'<div class="form-group" style="-webkit-flex:1 1 100%;flex:1 1 100%;min-width:100%;">'
+        +'<label class="form-label">נתיב קובץ שנטען (אופציונלי)</label>'
+        +'<input id="cfgLoadedFile" class="form-input mono" value="'+esc(S.cfgLoadedFile)+'"'
+          +' placeholder="D:\\...\\J1939_Motorized_Final_20042026.cfg">'
+      +'</div>'
+      +'<div class="form-group" style="-webkit-flex:1 1 100%;flex:1 1 100%;min-width:100%;">'
+        +'<label class="form-label">טעינת קובץ CFG ישירות באשף (אופציונלי)</label>'
+        +'<input id="cfgFileInput" class="form-input" type="file" accept=".cfg,text/plain">'
+        +(S.cfgFileName?'<div class="form-hint">קובץ נבחר: '+esc(S.cfgFileName)+'</div>':"")
+      +'</div>'
+      +'<div class="form-group" style="-webkit-flex:1 1 100%;flex:1 1 100%;min-width:100%;">'
+        +'<label class="form-label">תצוגת CFG מתוך הקובץ (כמו ב-Python)</label>'
+        +'<textarea id="cfgViewerPreview" rows="11" class="form-input mono" readonly'
+          +' placeholder="Loaded file: ...&#10;Header fields: ...&#10;Numeric fields: ...&#10;&#10;Quick preview:">'+esc(S.cfgViewerPreview||"")+'</textarea>'
+      +'</div>'
+      +'<div class="form-group" style="-webkit-flex:1 1 100%;flex:1 1 100%;min-width:100%;">'
+        +'<label class="form-label">פלט Python מה־CFG Viewer (מומלץ)</label>'
+        +'<textarea id="cfgPySummary" rows="8" class="form-input mono"'
+          +' placeholder="הדבק כאן את פלט הסיכום מה־Python (Loaded file + Quick preview)...">'+esc(S.cfgAutoReport||"")+'</textarea>'
+        +'<div class="form-hint">הדבק את הפלט שמכיל Loaded file ו-Quick preview (שורות 2001/2002/.../13003)</div>'
+      +'</div>'
+      +'<div class="form-group">'
+        +'<button type="button" class="btn-mini" id="btn-cfg-verify-py">בדוק מתוך פלט Python</button>'
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label req">אימות קונפיג ב-CFG Viewer</label>'
+        +'<select id="cfgVerified" class="form-input'+(S.cfgVerified==="yes"?" valid":"")+'">'
+          +renderSelectOptions(["yes","no"], S.cfgVerified, true, "— בחר —")
+        +'</select>'
+      +'</div>'
+    +'</div>'
+    +(S.cfgAutoStatus
+      ?'<div style="border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:10px;'
+        +'background:'+(S.cfgAutoStatus==="pass"?"#D1F0E0":"#FFF3CD")+';'
+        +'border:1.5px solid '+(S.cfgAutoStatus==="pass"?"#198754":"#ffc107")+';'
+        +'color:'+(S.cfgAutoStatus==="pass"?"#155724":"#856404")+';">'
+        +'<strong>'+(S.cfgAutoStatus==="pass"?"✅ אימות CFG אוטומטי עבר":"⚠️ אימות CFG אוטומטי נכשל")+'</strong><br>'
+        +esc(S.cfgAutoReport||"")
+      +'</div>'
+      :"")
+    +(S.cfgViewerPreview?renderCfgValidationRows():"")
+    +'<div class="code-box" style="font-size:12px;">'
+      +'<span class="code-comment"># הרצת בדיקה:</span><br>'
+      +'<span class="code-yellow">run_teltonika_cfg_viewer.bat</span><br>'
+      +'<span class="code-comment"># תיקיה:</span> D:\\New_Recovery\\2Plus\\ELAL POC\\Teltonika\\teltonika_cfg_viewer_package<br>'
+      +'<span class="code-comment"># ודא פרמטרים נטענו:</span> APN, primary_server_domain/ip, primary_server_port, protocol, fota_domain, fota_port, fota_period_min, fota_enabled'
+    +'</div>'
+    +'</div>';
+}
+
+// Step 5 — Navixe
+function renderForm5(){
+  var portErr=validate("navixePort",S.navixePort);
+  var fromCfg=!!(S.cfgNavixyDomain||S.cfgNavixyPort);
+  var vals=parseQuickPreviewValues(S.cfgViewerPreview||"");
+  var apn=vals["2001"]||"";
+  var apnUser=vals["2002"]||"";
+  var apnPass=vals["2003"]||"";
+  var secDomain=vals["2007"]||"";
+  var secPort=vals["2008"]||"";
+  var secProtoRaw=vals["2009"]||"";
+  var secProto=secProtoRaw?cfgMappedValue("2009",secProtoRaw):"";
+  var fotaDomain=vals["13000"]||"";
+  var fotaPort=vals["13001"]||"";
+  var fotaPeriod=vals["13002"]||"";
+  var fotaEnabledRaw=vals["13003"]||"";
+  var fotaEnabled=fotaEnabledRaw?cfgMappedValue("13003",fotaEnabledRaw):"";
+  return '<div style="background:#f4f6f8;border-radius:10px;padding:14px;margin:14px 0;">'
+    +'<div style="font-weight:700;color:#1A3A5C;margin-bottom:12px;">🌐 שרת נביקסי</div>'
+    +(fromCfg
+      ?'<div style="border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:10px;'
+        +'background:#eef6ff;border:1.5px solid #8cb9ff;color:#0b3d91;">'
+        +'<strong>נתונים מועתקים אוטומטית מה-Registration (CFG IDs 2004/2005)</strong><br>'
+        +'2004 Domain: '+esc(S.cfgNavixyDomain||"—")+' | 2005 Port: '+esc(S.cfgNavixyPort||"—")
+      +'</div>'
+      :"")
+    +'<div style="border-radius:8px;padding:10px 12px;font-size:12px;margin-bottom:10px;'
+      +'background:#f8f9ff;border:1.5px solid #d8dff6;color:#25324b;">'
+      +'<strong>Critical CFG communication values (from preview)</strong><br>'
+      +'APN (2001): <span class="mono">'+esc(apn||"—")+'</span> | '
+      +'APN User (2002): <span class="mono">'+esc(apnUser||"—")+'</span> | '
+      +'APN Password (2003): <span class="mono">'+esc(apnPass||"—")+'</span><br>'
+      +'Secondary Server (2007): <span class="mono">'+esc(secDomain||"—")+'</span> | '
+      +'Port (2008): <span class="mono">'+esc(secPort||"—")+'</span> | '
+      +'Protocol (2009): <span class="mono">'+esc(secProto||secProtoRaw||"—")+'</span><br>'
+      +'FOTA Domain (13000): <span class="mono">'+esc(fotaDomain||"—")+'</span> | '
+      +'FOTA Port (13001): <span class="mono">'+esc(fotaPort||"—")+'</span> | '
+      +'FOTA Period (13002): <span class="mono">'+esc(fotaPeriod||"—")+'</span> | '
+      +'FOTA Enabled (13003): <span class="mono">'+esc(fotaEnabled||fotaEnabledRaw||"—")+'</span>'
+    +'</div>'
+    +'<div class="form-grid">'
+      +'<div class="form-group">'
+        +'<label class="form-label">Server IP / Domain</label>'
+        +'<input id="navixeIp" class="form-input mono'+(S.navixeIp?" valid":"")+'"'
+          +' value="'+esc(S.navixeIp)+'" placeholder="192.168.1.100" autocomplete="off"'
+          +(fromCfg?' readonly':'')+'>'
+      +'</div>'
+      +'<div class="form-group">'
+        +'<label class="form-label">Port</label>'
+        +'<input id="navixePort" class="form-input mono'+fieldCls("navixePort",S.navixePort)+'"'
+          +' value="'+esc(S.navixePort)+'" placeholder="5027"'
+          +' type="tel" inputmode="numeric" maxlength="5" autocomplete="off"'
+          +(fromCfg?' readonly':'')+'>'
+        +hintHtml("navixePort",S.navixePort)
+      +'</div>'
+      +(fromCfg
+        ?'<div class="form-group">'
+          +'<label class="form-label req">אישור שימוש בנתוני Navixy מה-Registration</label>'
+          +'<select id="navixeApproved" class="form-input'+(S.navixeApproved==="yes"?" valid":"")+'">'
+            +renderSelectOptions(["yes","no"], S.navixeApproved, true, "— בחר —")
+          +'</select>'
+        +'</div>'
+        :"")
+    +'</div>'
+    +(S.navixeIp
+      ?'<div class="code-box" style="font-size:12px;">'
+        +'<span class="code-comment"># Teltonika Configurator → GPRS:</span><br>'
+        +'<span class="code-yellow">Server IP:</span> '+esc(S.navixeIp)+'<br>'
+        +'<span class="code-yellow">Port:</span>      '+esc(S.navixePort)+'<br>'
+        +'<span class="code-yellow">Protocol:</span>  Codec 8 Extended<br><br>'
+        +'<span class="code-comment"># Secondary server from CFG:</span><br>'
+        +'<span class="code-yellow">Secondary IP/Domain:</span> '+esc(secDomain||"—")+'<br>'
+        +'<span class="code-yellow">Secondary Port:</span>      '+esc(secPort||"—")+'<br>'
+        +'<span class="code-yellow">Secondary Protocol:</span>  '+esc(secProto||secProtoRaw||"—")+'<br><br>'
+        +'<span class="code-comment"># APN from CFG:</span><br>'
+        +'<span class="code-yellow">APN:</span> '+esc(apn||"—")+'<br>'
+        +'<span class="code-yellow">APN Username:</span> '+esc(apnUser||"—")+'<br>'
+        +'<span class="code-yellow">APN Password:</span> '+esc(apnPass||"—")+'<br><br>'
+        +'<span class="code-comment"># FOTA from CFG:</span><br>'
+        +'<span class="code-yellow">FOTA Domain:</span> '+esc(fotaDomain||"—")+'<br>'
+        +'<span class="code-yellow">FOTA Port:</span> '+esc(fotaPort||"—")+'<br>'
+        +'<span class="code-yellow">FOTA Period (min):</span> '+esc(fotaPeriod||"—")+'<br>'
+        +'<span class="code-yellow">FOTA Enabled:</span> '+esc(fotaEnabled||fotaEnabledRaw||"—")
+        +'</div>'
+      :"")
+    +'</div>';
+}
+
+// Step 6 — Cloud SMS commands
+function renderForm6(){
+  var pass=esc(S.smsPass||"MyPass123");
+  return '<div class="code-box">'
+    +'<span class="code-comment"># שלח SMS למספר ה-SIM של הטראקר:</span><br>'
+    +'<span class="code-yellow">'+pass+'</span> getinfo<br>'
+    +'<span class="code-comment"># תשובה: IMEI, FW, GPS, GPRS, I/O</span><br><br>'
+    +'<span class="code-yellow">'+pass+'</span> getgps<br>'
+    +'<span class="code-comment"># תשובה: Lat/Lon + מהירות + לוויינים</span>'
+    +'</div>';
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  IN-PLACE FIELD VALIDATION  (no re-render → no focus loss while typing)
+// ════════════════════════════════════════════════════════════════════════════
+var FIELD_HINTS = {
+  imei:       function(v){ return validate("imei",v)?"":(v?"✅ IMEI תקין":"ממדבקה/Configurator"); },
+  deviceName: function(v){ return validate("deviceName",v)?"":(v?"✅ פורמט תקין":"פורמט: GSE-ACU-5032"); },
+  simNum:     function(v){ return validate("simNum",v)?"":(v?"✅ מספר טלפון תקין":"מספר טלפון 9–15 ספרות (אפשר +)"); },
+  vin:        function(v){ return validate("vin",v)?"":(v?"✅ VIN תקין ("+v.length+"/17)":"17 תווים"); },
+  iccid:      function(v){ return ""; },
+  navixePort: function(v){ return ""; },
+  smsPass:    function(v){ return ""; },
+};
+
+function updateFieldUI(elId, key, val){
+  var el=document.getElementById(elId);
+  if(!el) return;
+  // Update border class
+  var base=el.className.replace(/\s*(invalid|valid)/g,"");
+  var err=validate(key,val);
+  if(err) el.className=base+" invalid";
+  else if(val&&!err) el.className=base+" valid";
+  else el.className=base;
+  // Update hint/error element (data-hint attribute set in hintHtml())
+  var hint=document.querySelector("[data-hint='"+key+"']");
+  if(!hint) return;
+  if(err){
+    hint.className="form-err";
+    hint.textContent="⚠️ "+err;
+  } else {
+    hint.className="form-hint";
+    hint.textContent=FIELD_HINTS[key]?FIELD_HINTS[key](val):"";
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  EVENT BINDING
+// ════════════════════════════════════════════════════════════════════════════
+function saveNotes(){
+  var nt=document.getElementById("notes");
+  if(nt) S.notes=nt.value;
+}
+
+// rerenderOnBlur=true: full re-render when user leaves field
+// (updates inherited banners, preview boxes, config filename, etc.)
+// During typing: only in-place validation — no focus loss
+function bindField(elId, key, rerenderOnBlur){
+  var el=document.getElementById(elId);
+  if(!el) return;
+  el.addEventListener("input",function(e){
+    S[key]=e.target.value;
+    saveState();
+    if(VALIDATORS[key]) updateFieldUI(elId,key,e.target.value);
+  });
+  if(rerenderOnBlur){
+    el.addEventListener("blur",function(){
+      saveNotes();
+      // Small delay so pending click events (checklist items etc.) fire first
+      setTimeout(render,50);
+    });
+  }
+}
+
+function bindSelect(elId, key, rerenderOnChange){
+  var el=document.getElementById(elId);
+  if(!el) return;
+  el.addEventListener("change",function(e){
+    S[key]=e.target.value;
+    if(key==="division"){
+      S.unit=S.division;
+      var sn=suggestedDeviceName();
+      if(sn && (!S.deviceName || /^GSE-[A-Za-z]+-\d{4,5}$/.test(S.deviceName))) S.deviceName=sn;
+    }
+    saveState();
+    if(rerenderOnChange) setTimeout(render,50);
+  });
+}
+
+function clearInstallationKeepTech(){
+  if(!confirm("לנקות את שדות ההתקנה (כלי, מכשיר, נביקסי, צ'קליסטים)?\nפרטי הטכנאי יישארו.")) return;
+  clearInstallationKeepTechNoConfirm();
+}
+
+function saveCsvAndNewKeepTech(){
+  saveNotes();exportCSV();flashSaveBadge("📥 CSV נשמר");clearInstallationKeepTechNoConfirm();
+}
+
+function clearInstallationKeepTechNoConfirm(){
+  S.step=1;S.completed=[];S.checks={1:{},2:{},3:{},4:{},5:{},6:{}};S.done=false;
+  S.licensePlate="";S.vehicleType="GSE";S.vin="";
+  S.site="TLV - Tel-aviv";S.division="";S.unit="";
+  S.gse="";S.energy="";S.tankBatterySpec="";S.installationDate="";
+  S.imei="";S.deviceName="";S.simNum="";S.iccid="";S.smsPass="";
+  S.contactName="";S.excelPhone="";
+  S.cfgLoadedFile="";S.cfgVerified="";
+  S.cfgFileName="";S.cfgAutoStatus="";S.cfgAutoReport="";S.cfgViewerPreview="";
+  S.cfgNavixyDomain="";S.cfgNavixyPort="";
+  S.navixeIp="";S.navixePort="5027";S.navixeApproved="";S.notes="";
+  saveState();render();
+}
+
+function setupSwipe(){
+  var card=document.getElementById("main-card");
+  if(!card) return;
+  var sx=0,sy=0;
+  card.addEventListener("touchstart",function(e){
+    sx=e.touches[0].clientX;sy=e.touches[0].clientY;
+  },{passive:true});
+  card.addEventListener("touchend",function(e){
+    var dx=e.changedTouches[0].clientX-sx;
+    var dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>60){
+      if(dx<0&&S.step<6){
+        if(canAdvanceFromStep(S.step)){S.step++;saveNotes();render();}
+      } else if(dx>0&&S.step>1){S.step--;saveNotes();render();}
+    }
+  },{passive:true});
+}
+
+function bindEvents(){
+  // Step nav
+  var navBtns=document.querySelectorAll("[data-goto]");
+  for(var i=0;i<navBtns.length;i++){
+    (function(btn){
+      btn.addEventListener("click",function(){
+        saveNotes();S.step=parseInt(btn.getAttribute("data-goto"),10);render();
+      });
+    })(navBtns[i]);
+  }
+  // Checklists
+  var chkItems=document.querySelectorAll("[data-chk]");
+  for(var j=0;j<chkItems.length;j++){
+    (function(el){
+      el.addEventListener("click",function(){
+        var step=parseInt(el.getAttribute("data-chk"),10);
+        var id=el.getAttribute("data-id");
+        S.checks[step][id]=!S.checks[step][id];
+        saveNotes();saveState();render();
+      });
+    })(chkItems[j]);
+  }
+  // Notes
+  var nt=document.getElementById("notes");
+  if(nt) nt.addEventListener("input",function(e){S.notes=e.target.value;saveState();});
+
+  // Step 1 — vehicle fields
+  bindSelect("division","division",true);
+  var gseEl=document.getElementById("gse");
+  if(gseEl){
+    gseEl.addEventListener("input",function(e){
+      var d=gseDigitsOnly(e.target.value).slice(0,5);
+      S.gse=d;
+      S.licensePlate=gseFormatted()||"";
+      var sn=suggestedDeviceName();
+      if(sn && (!S.deviceName || /^GSE-[A-Za-z]+-\d{4,5}$/.test(S.deviceName))) S.deviceName=sn;
+      S.contactName=S.deviceName||"";
+      e.target.value=d;
+      saveState();
+    });
+    gseEl.addEventListener("blur",function(){saveNotes();setTimeout(render,50);});
+  }
+  bindSelect("energy","energy",true);
+  bindField("tankBatterySpec","tankBatterySpec",true);
+  bindField("installationDate","installationDate",true);
+
+  var btnSug=document.getElementById("btn-suggest-fotaweb");
+  if(btnSug) btnSug.addEventListener("click",function(){
+    var sn=suggestedDeviceName();
+    if(!sn){alert("הוסף GSE עם 4–5 ספרות ובחר Category כדי לחשב שם FOTAWEB תקין.");return;}
+    S.deviceName=sn;
+    saveState();flashSaveBadge("✓ שם FOTAWEB נשמר לשלב 2");
+    setTimeout(render,30);
+  });
+
+  // Step 2 — FOTAWEB fields
+  var imeiEl=document.getElementById("imei");
+  if(imeiEl){
+    imeiEl.addEventListener("input",function(e){
+      var d=String(e.target.value||"").replace(/\D/g,"").slice(0,15);
+      S.imei=d;
+      e.target.value=d;
+      saveState();
+      updateFieldUI("imei","imei",d);
+    });
+    imeiEl.addEventListener("blur",function(){saveNotes();setTimeout(render,50);});
+  }
+  var dnEl=document.getElementById("deviceName");
+  if(dnEl){
+    dnEl.addEventListener("input",function(e){
+      S.deviceName=e.target.value;
+      S.contactName=S.deviceName||"";
+      saveState();
+      updateFieldUI("deviceName","deviceName",e.target.value);
+    });
+    dnEl.addEventListener("blur",function(){saveNotes();setTimeout(render,50);});
+  }
+  bindField("simNum","simNum",true);
+  bindField("iccid","iccid",false);
+  bindField("smsPass","smsPass",true);
+  bindField("excelPhone","excelPhone",false);
+
+  // Step 4 — Teltonika activation
+  bindField("cfgLoadedFile","cfgLoadedFile",false);
+  bindSelect("cfgVerified","cfgVerified",true);
+  var cfgFile=document.getElementById("cfgFileInput");
+  if(cfgFile){
+    cfgFile.addEventListener("change",async function(e){
+      var f=(e.target.files&&e.target.files[0])?e.target.files[0]:null;
+      if(!f) return;
+      try{
+        var decoded=await decodeCfgFile(f);
+        runCfgAutoCheck(f.name, String(decoded||""));
+        saveState();
+        setTimeout(render,30);
+      }catch(err){
+        S.cfgAutoStatus="fail";
+        S.cfgAutoReport="Failed reading selected file";
+        S.cfgViewerPreview="";
+        saveState();
+        setTimeout(render,30);
+      }
+    });
+  }
+  var pyTxt=document.getElementById("cfgPySummary");
+  if(pyTxt) pyTxt.addEventListener("input",function(e){
+    S.cfgAutoReport=e.target.value;
+    saveState();
+  });
+  var pyBtn=document.getElementById("btn-cfg-verify-py");
+  if(pyBtn) pyBtn.addEventListener("click",function(){
+    runPySummaryCheck(S.cfgAutoReport||"");
+    saveState();
+    setTimeout(render,30);
+  });
+
+  // Step 5 — Navixe fields
+  if(S.cfgNavixyDomain||S.cfgNavixyPort){
+    bindSelect("navixeApproved","navixeApproved",true);
+  } else {
+    bindField("navixeIp","navixeIp",true);
+    bindField("navixePort","navixePort",false);
+  }
+
+  // Tech fields
+  bindField("techName","techName",false);
+  bindField("techPhone","techPhone",false);
+
+  var btnClr=document.getElementById("btn-clear-form");
+  if(btnClr) btnClr.addEventListener("click",function(){saveNotes();clearInstallationKeepTech();});
+  var btnNew=document.getElementById("btn-save-new");
+  if(btnNew) btnNew.addEventListener("click",function(){
+    if(!confirm("לשמור קובץ CSV של ההתקנה הנוכחית ולאפס טופס לכלי הבא?\nפרטי הטכנאי יישארו.")) return;
+    saveCsvAndNewKeepTech();
+  });
+
+  // Nav buttons
+  var prev=document.getElementById("btn-prev");
+  if(prev) prev.addEventListener("click",function(){
+    saveNotes();S.step=Math.max(1,S.step-1);render();
+  });
+  var next=document.getElementById("btn-next");
+  if(next) next.addEventListener("click",function(){
+    saveNotes();
+    if(!canAdvanceFromStep(S.step)) return;
+    if(S.completed.indexOf(S.step)<0) S.completed.push(S.step);
+    if(S.step<6){S.step++;render();}else{S.done=true;render();}
+    saveState();
+  });
+
+  // Done screen
+  var csv=document.getElementById("btn-csv");
+  if(csv) csv.addEventListener("click",exportCSV);
+  var copy=document.getElementById("btn-copy");
+  if(copy) copy.addEventListener("click",copyToClipboard);
+  var print=document.getElementById("btn-print");
+  if(print) print.addEventListener("click",function(){window.print();});
+  var restart=document.getElementById("btn-restart");
+  if(restart) restart.addEventListener("click",function(){
+    if(!confirm("להתחיל התקנה חדשה?\nכל הנתונים הנוכחיים יימחקו.")) return;
+    S.step=1;S.completed=[];S.checks={1:{},2:{},3:{},4:{},5:{},6:{}};S.done=false;
+    S.techName="";S.techPhone="";
+    S.licensePlate="";S.vehicleType="GSE";S.vin="";
+    S.site="TLV - Tel-aviv";S.division="";S.unit="";
+    S.gse="";S.energy="";S.tankBatterySpec="";S.installationDate="";
+    S.imei="";S.deviceName="";S.simNum="";S.iccid="";S.smsPass="";
+    S.contactName="";S.excelPhone="";
+    S.cfgLoadedFile="";S.cfgVerified="";
+    S.cfgFileName="";S.cfgAutoStatus="";S.cfgAutoReport="";S.cfgViewerPreview="";
+    S.cfgNavixyDomain="";S.cfgNavixyPort="";
+    S.navixeIp="";S.navixePort="5027";S.navixeApproved="";S.notes="";
+    try{localStorage.removeItem(STORAGE_KEY);localStorage.removeItem("fmc650_wizard_v3");}catch(e){}
+    render();
+  });
+
+  setupSwipe();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════════════════
+loadState();
+render();
+</script>
+</body>
+</html>
