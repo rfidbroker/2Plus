@@ -43,6 +43,11 @@
         <input id="filterInput" class="input" placeholder="Filter id/name/value" title="Filter table rows" aria-label="Filter table rows">
       </div>
       <div class="row" style="margin-top:8px;">
+        <input id="cfgUrl" class="input" style="min-width:460px" placeholder="SharePoint/URL to a single .cfg file" title="CFG file URL" aria-label="CFG file URL">
+        <button id="btnLoadUrl" class="btn primary">Load from URL</button>
+        <span class="muted">Use direct file link (not folder link)</span>
+      </div>
+      <div class="row" style="margin-top:8px;">
         <span class="muted">Loaded file:</span>
         <span id="loadedFile" class="mono muted">No file loaded</span>
       </div>
@@ -132,6 +137,26 @@
       });
       return {header:header,numeric:numeric};
     }
+    function applyLoadedData(fileName, text){
+      var p=parseCfg(text);
+      STATE.fileName=fileName||"remote.cfg";
+      STATE.header=p.header;
+      STATE.numeric=p.numeric;
+      document.getElementById("loadedFile").textContent=STATE.fileName;
+      renderPreview();
+      compareValues();
+      renderTables();
+    }
+    function toDirectSharePointUrl(url){
+      var u=String(url||"").trim();
+      if(!u) return "";
+      if(/\/:f:\//i.test(u)) return "__FOLDER_LINK__";
+      if(/download=1/i.test(u)) return u;
+      if(/sharepoint\.com/i.test(u)){
+        return u + (u.indexOf("?")>=0 ? "&download=1" : "?download=1");
+      }
+      return u;
+    }
     async function decodeCfgFile(file){
       var ab=await file.arrayBuffer();
       var bytes=new Uint8Array(ab);
@@ -217,12 +242,36 @@
       var f=e.target.files&&e.target.files[0]?e.target.files[0]:null;
       if(!f) return;
       var txt=await decodeCfgFile(f);
-      var p=parseCfg(txt);
-      STATE.fileName=f.name; STATE.header=p.header; STATE.numeric=p.numeric;
-      document.getElementById("loadedFile").textContent=f.name;
-      renderPreview();
-      compareValues();
-      renderTables();
+      applyLoadedData(f.name, txt);
+    });
+    document.getElementById("btnLoadUrl").addEventListener("click", async function(){
+      var raw=document.getElementById("cfgUrl").value.trim();
+      if(!raw){ alert("Paste a direct .cfg file URL first."); return; }
+      var url=toDirectSharePointUrl(raw);
+      if(url==="__FOLDER_LINK__"){
+        alert("This is a SharePoint folder link. Please open the CFG file in SharePoint and copy its direct file link, or use local file picker from synced OneDrive folder.");
+        return;
+      }
+      try{
+        var res=await fetch(url,{method:"GET",credentials:"include"});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        var txt=await res.text();
+        if(txt.indexOf(":")<0 || txt.indexOf(";")<0){
+          throw new Error("Response does not look like a CFG payload");
+        }
+        var name=(url.split("/").pop()||"remote.cfg").split("?")[0]||"remote.cfg";
+        applyLoadedData(name, txt);
+      }catch(err){
+        alert(
+          "Failed to load from URL.\n\n"+
+          "Possible causes:\n"+
+          "- SharePoint auth/CORS restrictions\n"+
+          "- Link is a folder/share UI link, not direct file URL\n\n"+
+          "Recommended fallback:\n"+
+          "Sync SharePoint library with OneDrive and load the file using the file picker.\n\n"+
+          "Technical error: "+(err&&err.message?err.message:String(err))
+        );
+      }
     });
     document.getElementById("filterInput").addEventListener("input", renderTables);
     document.getElementById("btnExportJson").addEventListener("click", function(){
